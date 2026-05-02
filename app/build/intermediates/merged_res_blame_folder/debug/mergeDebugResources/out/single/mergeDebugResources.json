@@ -1,0 +1,10 @@
+[
+    {
+        "merged": "com.rebelfocus.app-debug-62:/xml_data_extraction_rules.xml.flat",
+        "source": "com.rebelfocus.app-main-64:/xml/data_extraction_rules.xml"
+    },
+    {
+        "merged": "com.rebelfocus.app-debug-62:/xml_backup_rules.xml.flat",
+        "source": "com.rebelfocus.app-main-64:/xml/backup_rules.xml"
+    }
+]
