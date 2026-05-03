@@ -86,7 +86,6 @@ class SessionEngine @Inject constructor(
         sessionRepository.insert(session)
         
         // Temporary debugging log
-        println("EXTREME_DEBUG: [Engine] Session Inserted - ID: ${session.id}, isExtreme: ${session.isExtremeMode}")
 
         logAudit(AuditEventType.SessionStarted, sessionId)
         return session

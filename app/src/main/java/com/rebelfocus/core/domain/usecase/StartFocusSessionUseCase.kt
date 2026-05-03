@@ -42,7 +42,6 @@ class StartFocusSessionUseCase @Inject constructor(
         }
 
         // Temporary debugging log
-        println("EXTREME_DEBUG: [UseCase] startFocusSessionUseCase called - isExtremeMode: $isExtremeMode, isUltimateMode: $isUltimateMode")
 
         sessionEngine.startSession(
             profileId = profileId,

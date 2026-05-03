@@ -44,19 +44,16 @@ class BlockingDecisionEngine @Inject constructor(
         // 1. Mandatory Exemptions (Self-exclusion and System UI)
         // In Extreme Mode, we even block Rebel Focus itself once the session is active.
         if (packageName == "com.android.systemui") {
-            println("EXTREME_DEBUG: [Blocking] Package EXEMPT: $packageName")
             return BlockDecision.Allow
         }
 
         // 2. Active session check
         val session = sessionRepository.getActiveSession()
             ?: run {
-                println("EXTREME_DEBUG: [Blocking] No active session found")
                 return BlockDecision.Allow
             }
 
         val isExtreme = session.isExtremeMode
-        println("EXTREME_DEBUG: [Blocking] Active Session: ${session.id}, State: ${session.state}, isExtreme: $isExtreme")
 
         // In Extreme Mode, we also exempt our own package ONLY if the session state is not active yet?
         // Actually, once session is active, even Rebel Focus is blocked.
@@ -69,7 +66,6 @@ class BlockingDecisionEngine @Inject constructor(
                                (isExtreme && session.state == SessionState.Break)
 
         if (!isEnforceableState) {
-            println("EXTREME_DEBUG: [Blocking] Skipping: State is not enforceable (state: ${session.state})")
             return BlockDecision.Allow
         }
 
@@ -77,12 +73,10 @@ class BlockingDecisionEngine @Inject constructor(
         return if (isExtreme) {
             // Extreme Mode: Any external app AND Rebel Focus itself are blocked.
             // (System UI remains exempt above)
-            println("EXTREME_DEBUG: [Blocking] EXTREME MODE BLOCK: $packageName")
             BlockDecision.Block(packageName)
         } else {
             // Normal Mode: Decide based on whitelist and user-selected blocked apps.
             if (packageName in WHITELISTED) {
-                println("EXTREME_DEBUG: [Blocking] Normal Mode: Package in static whitelist: $packageName")
                 return BlockDecision.Allow
             }
 
@@ -93,10 +87,8 @@ class BlockingDecisionEngine @Inject constructor(
             }
 
             if (packageName in cachedBlockedPackages) {
-                println("EXTREME_DEBUG: [Blocking] Normal Mode BLOCK: $packageName")
                 BlockDecision.Block(packageName)
             } else {
-                println("EXTREME_DEBUG: [Blocking] Normal Mode ALLOW: $packageName")
                 BlockDecision.Allow
             }
         }

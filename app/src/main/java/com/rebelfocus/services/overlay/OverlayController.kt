@@ -41,7 +41,6 @@ class OverlayController @Inject constructor(
      * Should be called with the AccessibilityService instance to provide the correct token.
      */
     fun updateContext(newContext: Context) {
-        println("EXTREME_DEBUG: [Overlay] Updating context/WindowManager from ${newContext::class.simpleName}")
         windowManager = newContext.getSystemService(Context.WINDOW_SERVICE) as WindowManager
     }
 
@@ -50,10 +49,8 @@ class OverlayController @Inject constructor(
      * Must be called from the main thread.
      */
     fun showOverlay(packageName: String, onEmergencyExit: () -> Unit) {
-        println("EXTREME_DEBUG: [Overlay] showOverlay ENTER - package: $packageName, isShowing: $isShowing, hasView: ${overlayView != null}")
         mainScope.launch {
             if (isShowing) {
-                println("EXTREME_DEBUG: [Overlay] showOverlay ABORT - already showing")
                 return@launch
             }
 
@@ -61,7 +58,6 @@ class OverlayController @Inject constructor(
                 setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
                 setContent {
                     Box(modifier = Modifier.onGloballyPositioned { coords ->
-                        println("EXTREME_DEBUG: [Overlay] Measured size: ${coords.size.width}x${coords.size.height}")
                     }) {
                         BlockingOverlayContent(
                             packageName = packageName,
@@ -99,17 +95,13 @@ class OverlayController @Inject constructor(
                 }
             }
 
-            println("EXTREME_DEBUG: [Overlay] LayoutParams - type: ${params.type}, flags: ${params.flags}, width: ${params.width}, height: ${params.height}")
 
             try {
-                println("EXTREME_DEBUG: [Overlay] WindowManager.addView START")
                 windowManager?.addView(view, params)
                 overlayView = view
                 lifecycleOwner = owner
                 isShowing = true
-                println("EXTREME_DEBUG: [Overlay] WindowManager.addView SUCCESS - isShowing: true")
             } catch (e: Exception) {
-                println("EXTREME_DEBUG: [Overlay] WindowManager.addView ERROR: ${e.message}")
                 e.printStackTrace()
             }
         }
@@ -119,17 +111,13 @@ class OverlayController @Inject constructor(
      * Hides the overlay if it is currently shown.
      */
     fun hideOverlay(reason: String = "unknown") {
-        println("EXTREME_DEBUG: [Overlay] hideOverlay REQUESTED - reason: $reason, isShowing: $isShowing")
         mainScope.launch {
             if (!isShowing) {
-                println("EXTREME_DEBUG: [Overlay] hideOverlay ABORT - not showing")
                 return@launch
             }
             try {
                 overlayView?.let { view ->
-                    println("EXTREME_DEBUG: [Overlay] WindowManager.removeView START")
                     windowManager?.removeView(view)
-                    println("EXTREME_DEBUG: [Overlay] WindowManager.removeView SUCCESS")
                     lifecycleOwner?.apply {
                         onPause()
                         onStop()
@@ -137,13 +125,11 @@ class OverlayController @Inject constructor(
                     }
                 }
             } catch (e: Exception) {
-                println("EXTREME_DEBUG: [Overlay] WindowManager.removeView ERROR: ${e.message}")
                 e.printStackTrace()
             } finally {
                 overlayView = null
                 lifecycleOwner = null
                 isShowing = false
-                println("EXTREME_DEBUG: [Overlay] hideOverlay COMPLETE - isShowing: false")
             }
         }
     }

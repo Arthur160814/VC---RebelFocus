@@ -57,7 +57,6 @@ class DashboardViewModel @Inject constructor(
             val profile = _state.value.profiles.find { it.id == profileId } ?: return@launch
             
             // Temporary debugging log
-            println("EXTREME_DEBUG: [Dashboard] Requesting Session Start - Profile: ${profile.name}, isExtreme: ${profile.isExtremeMode}")
             
             startFocusSessionUseCase(
                 profileId = profile.id,

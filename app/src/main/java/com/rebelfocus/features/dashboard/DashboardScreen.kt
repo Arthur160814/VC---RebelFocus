@@ -344,7 +344,7 @@ fun ActiveSessionCard(
                 Spacer(Modifier.height(32.dp))
                 Box(Modifier.fillMaxWidth(), contentAlignment = androidx.compose.ui.Alignment.Center) {
                     Text(
-                        text = "release 1.0.21",
+                        text = "release 1.0.24",
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
                     )

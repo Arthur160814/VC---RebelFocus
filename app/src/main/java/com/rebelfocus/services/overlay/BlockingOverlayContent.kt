@@ -44,7 +44,6 @@ fun BlockingOverlayContent(
     // Trigger haptic on phase change
     LaunchedEffect(session?.state) {
         if (session != null) {
-            println("EXTREME_DEBUG: [Overlay] Triggering Haptic for state: ${session?.state}")
             try {
                 if (vibrator.hasVibrator()) {
                     if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
@@ -55,7 +54,6 @@ fun BlockingOverlayContent(
                     }
                 }
             } catch (e: Exception) {
-                println("EXTREME_DEBUG: [Overlay] Haptic failed: ${e.message}")
             }
         }
     }
@@ -165,8 +163,9 @@ fun BlockingOverlayContent(
                             style = MaterialTheme.typography.bodyLarge,
                             color = Color.White.copy(alpha = 0.4f)
                         )
+                        val target = (session?.pomodoroTarget ?: 1).coerceAtLeast(1)
                         Text(
-                            text = "Intervals: ${session?.pomodoroCount} / ${session?.pomodoroTarget}",
+                            text = "Intervals: $target / $target",
                             style = MaterialTheme.typography.bodyLarge,
                             color = Color.White.copy(alpha = 0.4f)
                         )
@@ -196,60 +195,67 @@ fun BlockingOverlayContent(
 
                     // Circular Progress + Timer
                     Box(contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(
-                        progress = { 1f },
-                        modifier = Modifier.size(300.dp),
-                        color = Color.White.copy(alpha = 0.03f),
-                        strokeWidth = 4.dp,
-                        strokeCap = StrokeCap.Round
-                    )
-                    
-                    CircularProgressIndicator(
-                        progress = { progress },
-                        modifier = Modifier.size(300.dp),
-                        color = phaseColor,
-                        strokeWidth = 6.dp,
-                        strokeCap = StrokeCap.Round
-                    )
-                    
-                    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.graphicsLayer(scaleX = contentScale, scaleY = contentScale)) {
-                        AnimatedContent(
-                            targetState = session?.state,
-                            transitionSpec = {
-                                fadeIn(tween(600)) togetherWith fadeOut(tween(600))
+                        CircularProgressIndicator(
+                            progress = { 1f },
+                            modifier = Modifier.size(300.dp),
+                            color = Color.White.copy(alpha = 0.03f),
+                            strokeWidth = 4.dp,
+                            strokeCap = StrokeCap.Round
+                        )
+                        
+                        CircularProgressIndicator(
+                            progress = { progress },
+                            modifier = Modifier.size(300.dp),
+                            color = phaseColor,
+                            strokeWidth = 6.dp,
+                            strokeCap = StrokeCap.Round
+                        )
+                        
+                        Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.graphicsLayer(scaleX = contentScale, scaleY = contentScale)) {
+                            AnimatedContent(
+                                targetState = session?.state,
+                                transitionSpec = {
+                                    fadeIn(tween(600)) togetherWith fadeOut(tween(600))
+                                }
+                            ) { state ->
+                                Text(
+                                    text = when(state) {
+                                        com.rebelfocus.core.model.SessionState.ActiveFocus -> "FOCUS"
+                                        com.rebelfocus.core.model.SessionState.Break -> "BREAK"
+                                        com.rebelfocus.core.model.SessionState.Paused -> "PAUSED"
+                                        else -> "READY"
+                                    },
+                                    style = MaterialTheme.typography.labelLarge,
+                                    color = phaseColor,
+                                    letterSpacing = 6.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
                             }
-                        ) { state ->
+                            Spacer(Modifier.height(8.dp))
                             Text(
-                                text = when(state) {
-                                    com.rebelfocus.core.model.SessionState.ActiveFocus -> "FOCUS"
-                                    com.rebelfocus.core.model.SessionState.Break -> "BREAK"
-                                    com.rebelfocus.core.model.SessionState.Paused -> "PAUSED"
-                                    else -> "READY"
-                                },
-                                style = MaterialTheme.typography.labelLarge,
-                                color = phaseColor,
-                                letterSpacing = 6.sp,
-                                fontWeight = FontWeight.Bold
+                                text = timerText,
+                                style = MaterialTheme.typography.displayLarge.copy(
+                                    fontSize = 72.sp,
+                                    fontWeight = FontWeight.Light,
+                                    letterSpacing = (-2).sp
+                                ),
+                                color = Color.White
                             )
                         }
-                        Spacer(Modifier.height(8.dp))
-                        Text(
-                            text = timerText,
-                            style = MaterialTheme.typography.displayLarge.copy(
-                                fontSize = 72.sp,
-                                fontWeight = FontWeight.Light,
-                                letterSpacing = (-2).sp
-                            ),
-                            color = Color.White
-                        )
                     }
                 }
 
                 Spacer(Modifier.height(80.dp))
 
-                if (session?.pomodoroTarget ?: 0 > 1) {
+                if (session?.state != com.rebelfocus.core.model.SessionState.Completed && (session?.pomodoroTarget ?: 0) > 1) {
+                    val displayInterval = if (session?.state == com.rebelfocus.core.model.SessionState.Break) {
+                        session?.pomodoroCount ?: 0
+                    } else {
+                        (session?.pomodoroCount ?: 0) + 1
+                    }.coerceIn(1, session?.pomodoroTarget ?: 1)
+
                     Text(
-                        text = "Interval ${session?.pomodoroCount} of ${session?.pomodoroTarget}",
+                        text = "Interval $displayInterval of ${session?.pomodoroTarget}",
                         style = MaterialTheme.typography.bodyLarge,
                         color = Color.White.copy(alpha = 0.4f),
                         letterSpacing = 1.sp
@@ -280,5 +286,4 @@ fun BlockingOverlayContent(
             }
         }
     }
-}
 }

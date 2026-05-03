@@ -79,12 +79,10 @@ class RebelFocusAccessibilityService : AccessibilityService() {
 
             val decision = blockingDecisionEngine.evaluate(packageName)
             
-            println("EXTREME_DEBUG: [Service] Decision for $packageName: ${decision::class.simpleName}")
 
             when (decision) {
                 is BlockDecision.Block -> {
                     enforcedPackage = packageName
-                    println("EXTREME_DEBUG: [Service] REQUESTING OVERLAY for $packageName")
                     if (isExtreme) {
                         diagnosticLogDao.insert(com.rebelfocus.core.database.entity.DiagnosticLogEntity(
                             timestamp = System.currentTimeMillis(),
@@ -105,14 +103,12 @@ class RebelFocusAccessibilityService : AccessibilityService() {
                     // CRITICAL FIX: Do not dismiss the overlay if the 'Allow' is for our own package
                     // while we are in the middle of enforcing a block on an external package.
                     if (packageName == "com.rebelfocus" && enforcedPackage != null) {
-                        println("EXTREME_DEBUG: [Service] Ignoring Allow for com.rebelfocus - Enforcement active for $enforcedPackage")
                         return@launch
                     }
                     
                     // NEW: Do not dismiss if we are showing the Completion Summary
                     val currentSession = sessionRepository.observeEnforcementSession().firstOrNull()
                     if (currentSession?.state == com.rebelfocus.core.model.SessionState.Completed) {
-                        println("EXTREME_DEBUG: [Service] Ignoring Allow - Completion Summary active")
                         return@launch
                     }
                     
@@ -131,7 +127,6 @@ class RebelFocusAccessibilityService : AccessibilityService() {
                                        session.state == com.rebelfocus.core.model.SessionState.Break
                     
                     if (isEnforceable) {
-                        println("EXTREME_DEBUG: [Service] Session-driven overlay trigger for ${session.state}")
                         enforcedPackage = "com.rebelfocus" // Representing internal/general block
                         overlayController.showOverlay(
                             packageName = "com.rebelfocus",
@@ -140,7 +135,6 @@ class RebelFocusAccessibilityService : AccessibilityService() {
                     } else if (session.state == com.rebelfocus.core.model.SessionState.Completed) {
                         // CRITICAL FIX: Do NOT hide the overlay if it just transitioned to Completed.
                         // Let the overlay content show the "Well Done" screen.
-                        println("EXTREME_DEBUG: [Service] Session COMPLETED. Keeping overlay for summary.")
                         enforcedPackage = "com.rebelfocus.summary"
                     } else {
                         // If session is paused or cancelled, hide if it was an extreme block
@@ -161,7 +155,6 @@ class RebelFocusAccessibilityService : AccessibilityService() {
     private fun handleEmergencyExit(isExtreme: Boolean = false) {
         scope.launch {
             val session = sessionRepository.getActiveSession()
-            println("EXTREME_DEBUG: [Service] handleEmergencyExit - session: ${session?.id}, state: ${session?.state}")
             
             if (session != null) {
                 if (session.state != com.rebelfocus.core.model.SessionState.Completed) {
@@ -177,7 +170,6 @@ class RebelFocusAccessibilityService : AccessibilityService() {
                     stopFocusSessionUseCase(session.id, reason = com.rebelfocus.core.domain.usecase.StopReason.EmergencyExit)
                     logAuditEvent(AuditEventType.SessionEmergencyExit, sessionId = session.id)
                 } else {
-                    println("EXTREME_DEBUG: [Service] Session already completed. Just dismissing overlay.")
                 }
             }
             enforcedPackage = null
