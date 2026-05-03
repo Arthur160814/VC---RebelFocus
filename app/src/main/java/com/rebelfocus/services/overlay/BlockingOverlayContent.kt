@@ -158,14 +158,23 @@ fun BlockingOverlayContent(
                             fontWeight = FontWeight.Light
                         )
                         Spacer(Modifier.height(48.dp))
+                        val safeTarget = (session?.pomodoroTarget ?: 1).coerceAtLeast(1)
+                        val totalFocusMillis = (session?.plannedDurationMillis ?: 0) * safeTarget
+                        val totalMinutes = totalFocusMillis / 60000
+                        val focusText = if (totalMinutes < 60) {
+                            "${totalMinutes}m"
+                        } else {
+                            val h = totalMinutes / 60
+                            val m = totalMinutes % 60
+                            if (m == 0L) "${h}h" else "${h}h ${m}m"
+                        }
                         Text(
-                            text = "Focus: ${session?.plannedDurationMillis?.div(60000)}m",
+                            text = "Focus: $focusText",
                             style = MaterialTheme.typography.bodyLarge,
                             color = Color.White.copy(alpha = 0.4f)
                         )
-                        val target = (session?.pomodoroTarget ?: 1).coerceAtLeast(1)
                         Text(
-                            text = "Intervals: $target / $target",
+                            text = "Intervals: $safeTarget / $safeTarget",
                             style = MaterialTheme.typography.bodyLarge,
                             color = Color.White.copy(alpha = 0.4f)
                         )
