@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "com.rebelfocus.app-mergeDebugResources-60:/values-v21/values-v21.xml",
+            "outputFile": "com.rebelfocus.app-mergeDebugResources-64:/values-v21/values-v21.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\MI PC\\.gradle\\caches\\transforms-4\\b81d6e7bf1235c407e3e55c881162a47\\transformed\\core-1.13.1\\res\\values-v21\\values-v21.xml",
+                    "source": "C:\\Users\\MI PC\\.gradle\\caches\\transforms-4\\ce02f6e17083b222e680ebf2608410c4\\transformed\\core-1.13.1\\res\\values-v21\\values-v21.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9,10,13",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4",

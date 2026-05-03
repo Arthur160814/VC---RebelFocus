@@ -45,6 +45,10 @@ attr startDestination
 attr targetPackage
 attr ttcIndex
 attr uri
+bool enable_system_alarm_service_default
+bool enable_system_foreground_service_default
+bool enable_system_job_service_default
+bool workmanager_test_configuration
 color androidx_core_ripple_material_light
 color androidx_core_secondary_text_default_material_light
 color call_notification_answer_color
@@ -195,6 +199,7 @@ layout notification_template_custom_big
 layout notification_template_icon_group
 layout notification_template_part_chronometer
 layout notification_template_part_time
+string accessibility_service_description
 string androidx_startup
 string app_name
 string call_notification_answer_action
@@ -307,5 +312,6 @@ styleable NavGraphNavigator startDestination
 styleable NavHost navGraph
 styleable NavInclude graph
 styleable Navigator android_label android_id route
+xml accessibility_service_config
 xml backup_rules
 xml data_extraction_rules

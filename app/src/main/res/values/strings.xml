@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Rebel Focus</string>
+    <string name="accessibility_service_description">Rebel Focus uses the Accessibility Service to detect when a distracting app is opened during a focus session and block it. It does not read your screen content or typing.</string>
 </resources>

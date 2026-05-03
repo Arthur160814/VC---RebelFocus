@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="accessibility_service_description">Rebel Focus uses the Accessibility Service to detect when a distracting app is opened during a focus session and block it. It does not read your screen content or typing.</string>
     <string name="app_name">Rebel Focus</string>
     <style name="Theme.RebelFocus" parent="android:Theme.Material.Light.NoActionBar"/>
 </resources>
