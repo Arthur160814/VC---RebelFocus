@@ -12,7 +12,7 @@ data class BackupContainerDto(
     val profileBlockedAppCrossRefs: List<ProfileBlockedAppCrossRefDto>
 ) {
     companion object {
-        const val CURRENT_VERSION = 2
+        const val CURRENT_VERSION = 3
     }
 }
 
@@ -23,6 +23,7 @@ data class FocusProfileDto(
     val isDefault: Boolean,
     val sessionType: String,
     val isExtremeMode: Boolean = false,
+    val isUltimateMode: Boolean = false,
     val focusDurationMillis: Long,
     val breakDurationMillis: Long,
     val pomodoroTarget: Int,

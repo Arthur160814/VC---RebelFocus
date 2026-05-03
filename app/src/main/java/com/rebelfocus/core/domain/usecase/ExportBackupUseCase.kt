@@ -37,7 +37,7 @@ class ExportBackupUseCase @Inject constructor(
                 version = BackupContainerDto.CURRENT_VERSION,
                 exportTimestamp = System.currentTimeMillis(),
                 profiles = profiles.map { 
-                    FocusProfileDto(it.id, it.name, it.isDefault, it.sessionType, it.isExtremeMode, it.focusDurationMillis, it.breakDurationMillis, it.pomodoroTarget, it.createdAt, it.updatedAt)
+                    FocusProfileDto(it.id, it.name, it.isDefault, it.sessionType, it.isExtremeMode, it.isUltimateMode, it.focusDurationMillis, it.breakDurationMillis, it.pomodoroTarget, it.createdAt, it.updatedAt)
                 },
                 blockedApps = apps.map {
                     BlockedAppDto(it.packageName, it.appName, it.isEnabled, it.createdAt, it.updatedAt)

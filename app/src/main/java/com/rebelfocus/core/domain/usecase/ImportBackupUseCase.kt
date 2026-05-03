@@ -66,7 +66,8 @@ class ImportBackupUseCase @Inject constructor(
                     isDefault = it.isDefault,
                     sessionType = it.sessionType,
                     isExtremeMode = it.isExtremeMode,
-                    isUltimateMode = false, // Default for imported backups
+                    // Enforce consistency: Ultimate requires Extreme
+                    isUltimateMode = it.isUltimateMode && it.isExtremeMode,
                     focusDurationMillis = it.focusDurationMillis,
                     breakDurationMillis = it.breakDurationMillis,
                     pomodoroTarget = it.pomodoroTarget,

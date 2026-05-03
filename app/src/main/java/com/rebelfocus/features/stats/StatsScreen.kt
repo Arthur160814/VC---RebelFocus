@@ -7,13 +7,13 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Warning
-import androidx.compose.material.icons.filled.List
 import androidx.compose.material3.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.horizontalScroll
@@ -113,7 +113,7 @@ fun StatsScreen(
                         StatCard(
                             label = "Daily Average",
                             value = formatAverageTime(s.dailyAverageMillis),
-                            icon = Icons.Default.List,
+                            icon = Icons.AutoMirrored.Filled.List,
                             modifier = Modifier.weight(1f)
                         )
                     }
@@ -203,7 +203,7 @@ fun StatsScreen(
                 }
 
                 item {
-                    Spacer(Modifier.height(8.dp))
+                    Spacer(Modifier.height(16.dp))
                     Text("Recent Sessions", style = MaterialTheme.typography.titleMedium)
                 }
 
@@ -391,14 +391,24 @@ fun RecentSessionRow(session: RecentSession) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Column(modifier = Modifier.weight(1f)) {
+            val modeLabel = when (session.mode) {
+                FocusMode.NORMAL -> "Normal Focus"
+                FocusMode.EXTREME -> "Extreme Focus"
+                FocusMode.ULTIMATE -> "Ultimate Focus"
+            }
             Text(
-                text = "${session.dateLabel} · ${session.mode.name.lowercase().replaceFirstChar { it.uppercase() }}",
+                text = "${session.dateLabel} · $modeLabel",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurface
             )
             Spacer(Modifier.height(2.dp))
+            val durationLabel = if (session.durationMillis > 0 && session.durationMillis < 60000) {
+                "< 1 min"
+            } else {
+                "${durationMinutes} min"
+            }
             Text(
-                text = "${durationMinutes} min · ${session.stateLabel}",
+                text = "$durationLabel · ${session.stateLabel}",
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
             )
@@ -616,6 +626,7 @@ fun WeeklyDistributionChart(stats: FocusStats) {
 private fun formatTotalTime(millis: Long): String {
     val totalMinutes = millis / 60000
     return when {
+        millis > 0 && millis < 60000 -> "< 1 min"
         totalMinutes < 60 -> "${totalMinutes} min"
         totalMinutes == 60L -> "1h"
         else -> {
@@ -629,7 +640,8 @@ private fun formatTotalTime(millis: Long): String {
 private fun formatAverageTime(millis: Long): String {
     val totalMinutes = millis / 60000
     return when {
-        totalMinutes == 0L -> "0 min/day"
+        millis == 0L -> "0 min/day"
+        millis > 0 && millis < 60000 -> "< 1 min/day"
         totalMinutes < 60 -> "${totalMinutes} min/day"
         else -> {
             val h = totalMinutes / 60
