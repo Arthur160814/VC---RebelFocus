@@ -3,6 +3,7 @@ package com.rebelfocus.core.domain.usecase
 import com.rebelfocus.core.database.dao.SessionDao
 import com.rebelfocus.core.database.entity.SessionEntity
 import com.rebelfocus.core.model.FocusStats
+import com.rebelfocus.core.model.StatsRange
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
@@ -40,7 +41,7 @@ class GetFocusStatsUseCaseTest {
 
         fakeSessionDao.emit(sessions)
 
-        val stats = getFocusStatsUseCase().first()
+        val stats = getFocusStatsUseCase(StatsRange.ALL).first()
 
         assertEquals(3, stats.currentStreak)
         assertEquals(3, stats.longestStreak)
@@ -58,7 +59,7 @@ class GetFocusStatsUseCaseTest {
 
         fakeSessionDao.emit(sessions)
 
-        val stats = getFocusStatsUseCase().first()
+        val stats = getFocusStatsUseCase(StatsRange.ALL).first()
 
         assertEquals(0, stats.currentStreak)
         assertEquals(1, stats.longestStreak)
@@ -77,7 +78,7 @@ class GetFocusStatsUseCaseTest {
 
         fakeSessionDao.emit(sessions)
 
-        val stats = getFocusStatsUseCase().first()
+        val stats = getFocusStatsUseCase(StatsRange.ALL).first()
 
         assertEquals(2, stats.currentStreak)
         assertEquals(2, stats.longestStreak)

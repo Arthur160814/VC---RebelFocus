@@ -2,10 +2,29 @@ package com.rebelfocus.core.model
 
 import java.time.LocalDate
 
+enum class FocusMode {
+    NORMAL, EXTREME, ULTIMATE
+}
+
+data class ModeUsageStats(
+    val focusTimeMillis: Long,
+    val completedSessions: Int,
+    val completionRate: Float?, // null if no terminal sessions
+    val totalTerminalSessions: Int
+)
+
 data class FocusStats(
     val totalSessions: Int,
     val totalFocusTimeMillis: Long,
     val currentStreak: Int,
     val longestStreak: Int,
-    val sessionsPerDay: Map<LocalDate, Int> // Last 7 days
+    val dailyAverageMillis: Long,
+    val completionRate: Float,
+    val interruptedCount: Int,
+    val bestDayName: String?,
+    val bestDayFocusMillis: Long,
+    val focusMinutesPerDay: Map<java.time.LocalDate, Long>,
+    val selectedRange: StatsRange,
+    val modeUsage: Map<FocusMode, ModeUsageStats>,
+    val mostEffectiveMode: FocusMode?
 )
