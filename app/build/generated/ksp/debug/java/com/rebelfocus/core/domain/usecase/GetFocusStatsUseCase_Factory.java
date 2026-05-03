@@ -1,5 +1,6 @@
 package com.rebelfocus.core.domain.usecase;
 
+import com.rebelfocus.core.data.datastore.UserPreferencesDataStore;
 import com.rebelfocus.core.database.dao.SessionDao;
 import dagger.internal.DaggerGenerated;
 import dagger.internal.Factory;
@@ -25,20 +26,26 @@ import javax.inject.Provider;
 public final class GetFocusStatsUseCase_Factory implements Factory<GetFocusStatsUseCase> {
   private final Provider<SessionDao> sessionDaoProvider;
 
-  public GetFocusStatsUseCase_Factory(Provider<SessionDao> sessionDaoProvider) {
+  private final Provider<UserPreferencesDataStore> userPreferencesDataStoreProvider;
+
+  public GetFocusStatsUseCase_Factory(Provider<SessionDao> sessionDaoProvider,
+      Provider<UserPreferencesDataStore> userPreferencesDataStoreProvider) {
     this.sessionDaoProvider = sessionDaoProvider;
+    this.userPreferencesDataStoreProvider = userPreferencesDataStoreProvider;
   }
 
   @Override
   public GetFocusStatsUseCase get() {
-    return newInstance(sessionDaoProvider.get());
+    return newInstance(sessionDaoProvider.get(), userPreferencesDataStoreProvider.get());
   }
 
-  public static GetFocusStatsUseCase_Factory create(Provider<SessionDao> sessionDaoProvider) {
-    return new GetFocusStatsUseCase_Factory(sessionDaoProvider);
+  public static GetFocusStatsUseCase_Factory create(Provider<SessionDao> sessionDaoProvider,
+      Provider<UserPreferencesDataStore> userPreferencesDataStoreProvider) {
+    return new GetFocusStatsUseCase_Factory(sessionDaoProvider, userPreferencesDataStoreProvider);
   }
 
-  public static GetFocusStatsUseCase newInstance(SessionDao sessionDao) {
-    return new GetFocusStatsUseCase(sessionDao);
+  public static GetFocusStatsUseCase newInstance(SessionDao sessionDao,
+      UserPreferencesDataStore userPreferencesDataStore) {
+    return new GetFocusStatsUseCase(sessionDao, userPreferencesDataStore);
   }
 }

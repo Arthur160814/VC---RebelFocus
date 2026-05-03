@@ -46,6 +46,7 @@ class UserPreferencesDataStore @Inject constructor(
         val NOTIFICATION_ENABLED = booleanPreferencesKey("notification_enabled")
         val OVERLAY_ENABLED = booleanPreferencesKey("overlay_enabled")
         val LAST_ACTIVE_PROFILE_ID = stringPreferencesKey("last_active_profile_id")
+        val WEEKLY_FOCUS_GOAL_MINUTES = intPreferencesKey("weekly_focus_goal_minutes")
     }
 
     // ── Onboarding ────────────────────────────────────
@@ -124,6 +125,18 @@ class UserPreferencesDataStore @Inject constructor(
             } else {
                 prefs.remove(Keys.LAST_ACTIVE_PROFILE_ID)
             }
+        }
+    }
+
+    // ── Weekly Goal ──────────────────────────────────
+    
+    val weeklyFocusGoalMinutes: Flow<Int> = dataStore.data.map { prefs ->
+        prefs[Keys.WEEKLY_FOCUS_GOAL_MINUTES] ?: 120
+    }
+
+    suspend fun setWeeklyFocusGoalMinutes(minutes: Int) {
+        dataStore.edit { prefs ->
+            prefs[Keys.WEEKLY_FOCUS_GOAL_MINUTES] = minutes
         }
     }
 }

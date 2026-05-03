@@ -26,5 +26,16 @@ data class FocusStats(
     val focusMinutesPerDay: Map<java.time.LocalDate, Long>,
     val selectedRange: StatsRange,
     val modeUsage: Map<FocusMode, ModeUsageStats>,
-    val mostEffectiveMode: FocusMode?
+    val mostEffectiveMode: FocusMode?,
+    val weeklyGoalTargetMinutes: Int,
+    val weeklyGoalProgressMinutes: Int,
+    val recentSessions: List<RecentSession>
+)
+
+data class RecentSession(
+    val id: String,
+    val dateLabel: String,
+    val mode: FocusMode,
+    val durationMillis: Long,
+    val stateLabel: String
 )

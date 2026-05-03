@@ -1,23 +1,30 @@
 package com.rebelfocus.core.domain.usecase
 
+import com.rebelfocus.core.data.datastore.UserPreferencesDataStore
 import com.rebelfocus.core.database.dao.SessionDao
 import com.rebelfocus.core.database.entity.SessionEntity
 import com.rebelfocus.core.model.FocusMode
 import com.rebelfocus.core.model.FocusStats
 import com.rebelfocus.core.model.ModeUsageStats
+import com.rebelfocus.core.model.RecentSession
 import com.rebelfocus.core.model.StatsRange
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.combine
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
 class GetFocusStatsUseCase @Inject constructor(
-    private val sessionDao: SessionDao
+    private val sessionDao: SessionDao,
+    private val userPreferencesDataStore: UserPreferencesDataStore
 ) {
     operator fun invoke(range: StatsRange): Flow<FocusStats> {
-        return sessionDao.observeAll().map { sessions ->
+        return combine(
+            sessionDao.observeAll(),
+            userPreferencesDataStore.weeklyFocusGoalMinutes
+        ) { sessions, goalTarget ->
             val today = LocalDate.now()
             val terminalStates = listOf("Completed", "Cancelled", "EmergencyExit", "Failed")
             val interruptedStates = listOf("Cancelled", "EmergencyExit", "Failed")
@@ -107,6 +114,31 @@ class GetFocusStatsUseCase @Inject constructor(
                 bestDayEntry?.key?.dayOfWeek?.getDisplayName(java.time.format.TextStyle.FULL, java.util.Locale.getDefault())
             } else null
 
+            // Weekly Goal Calculation (Monday to Sunday)
+            val startOfWeek = today.with(java.time.temporal.TemporalAdjusters.previousOrSame(java.time.DayOfWeek.MONDAY))
+            val endOfWeek = today.with(java.time.temporal.TemporalAdjusters.nextOrSame(java.time.DayOfWeek.SUNDAY))
+            
+            val weeklyCompletedSessions = sessions.filter { 
+                it.state == "Completed" && getSessionEndDate(it) in startOfWeek..endOfWeek 
+            }
+            val weeklyFocusMillis = weeklyCompletedSessions.sumOf { it.elapsedAtPauseMillis }
+            val weeklyFocusMinutes = (weeklyFocusMillis / (1000 * 60)).toInt()
+
+            // Recent Sessions (Last 5 terminal sessions in range)
+            val recentSessions = sessionsInRange
+                .filter { it.state in terminalStates }
+                .sortedByDescending { it.completedAt ?: it.updatedAt }
+                .take(5)
+                .map { session ->
+                    RecentSession(
+                        id = session.id,
+                        dateLabel = getRelativeDateLabel(getSessionEndDate(session)),
+                        mode = getFocusMode(session),
+                        durationMillis = session.elapsedAtPauseMillis,
+                        stateLabel = getHumanStateLabel(session.state)
+                    )
+                }
+
             FocusStats(
                 totalSessions = totalSessions,
                 totalFocusTimeMillis = totalTime,
@@ -120,7 +152,10 @@ class GetFocusStatsUseCase @Inject constructor(
                 focusMinutesPerDay = focusMinutesPerDay,
                 selectedRange = range,
                 modeUsage = modeUsage,
-                mostEffectiveMode = mostEffectiveMode
+                mostEffectiveMode = mostEffectiveMode,
+                weeklyGoalTargetMinutes = goalTarget,
+                weeklyGoalProgressMinutes = weeklyFocusMinutes,
+                recentSessions = recentSessions
             )
         }
     }
@@ -135,6 +170,25 @@ class GetFocusStatsUseCase @Inject constructor(
             session.isUltimateMode -> FocusMode.ULTIMATE
             session.isExtremeMode -> FocusMode.EXTREME
             else -> FocusMode.NORMAL
+        }
+    }
+
+    private fun getRelativeDateLabel(date: LocalDate): String {
+        val today = LocalDate.now()
+        return when (date) {
+            today -> "Today"
+            today.minusDays(1) -> "Yesterday"
+            else -> date.format(DateTimeFormatter.ofPattern("dd MMM"))
+        }
+    }
+
+    private fun getHumanStateLabel(state: String): String {
+        return when (state) {
+            "Completed" -> "Completed"
+            "Cancelled" -> "Cancelled"
+            "EmergencyExit" -> "Emergency Exit"
+            "Failed" -> "Failed"
+            else -> state
         }
     }
 

@@ -20,10 +20,9 @@ import androidx.compose.foundation.horizontalScroll
 import com.rebelfocus.core.model.FocusMode
 import com.rebelfocus.core.model.FocusStats
 import com.rebelfocus.core.model.ModeUsageStats
+import com.rebelfocus.core.model.RecentSession
 import com.rebelfocus.core.model.StatsRange
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -42,6 +41,8 @@ fun StatsScreen(
     viewModel: StatsViewModel = hiltViewModel()
 ) {
     val stats by viewModel.stats.collectAsState()
+    val selectedRange by viewModel.selectedRange.collectAsState()
+    var showGoalDialog by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -78,21 +79,19 @@ fun StatsScreen(
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 item {
-                    val ranges = listOf(StatsRange.SEVEN_DAYS, StatsRange.THIRTY_DAYS, StatsRange.ALL)
-                    val rangeLabels = listOf("7D", "30D", "All")
-                    val selectedRange by viewModel.selectedRange.collectAsState()
+                    StatsRangeSelector(
+                        selectedRange = selectedRange,
+                        onRangeSelected = { viewModel.setRange(it) }
+                    )
+                }
 
-                    SingleChoiceSegmentedButtonRow(
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        ranges.forEachIndexed { index, range ->
-                            SegmentedButton(
-                                selected = range == selectedRange,
-                                onClick = { viewModel.setRange(range) },
-                                shape = SegmentedButtonDefaults.itemShape(index = index, count = ranges.size),
-                                label = { Text(rangeLabels[index]) }
-                            )
-                        }
+                stats?.let { s ->
+                    item {
+                        WeeklyGoalCard(
+                            targetMinutes = s.weeklyGoalTargetMinutes,
+                            progressMinutes = s.weeklyGoalProgressMinutes,
+                            onEditClick = { showGoalDialog = true }
+                        )
                     }
                 }
 
@@ -204,6 +203,28 @@ fun StatsScreen(
                 }
 
                 item {
+                    Spacer(Modifier.height(8.dp))
+                    Text("Recent Sessions", style = MaterialTheme.typography.titleMedium)
+                }
+
+                stats?.let { s ->
+                    if (s.recentSessions.isEmpty()) {
+                        item {
+                            Text(
+                                "No completed or interrupted sessions yet.",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.outline,
+                                modifier = Modifier.padding(vertical = 8.dp)
+                            )
+                        }
+                    } else {
+                        item {
+                            RecentSessionsSection(s.recentSessions)
+                        }
+                    }
+                }
+
+                item {
                     val chartTitle = when (s.selectedRange) {
                         StatsRange.SEVEN_DAYS -> "Focus Minutes - Last 7 Days"
                         StatsRange.THIRTY_DAYS -> "Focus Minutes - Last 30 Days"
@@ -217,6 +238,200 @@ fun StatsScreen(
                     WeeklyDistributionChart(s)
                 }
             }
+        }
+    }
+    
+    if (showGoalDialog) {
+        val currentGoal = stats?.weeklyGoalTargetMinutes ?: 120
+        WeeklyGoalEditDialog(
+            currentGoal = currentGoal,
+            onDismiss = { showGoalDialog = false },
+            onGoalSelected = {
+                viewModel.updateWeeklyGoal(it)
+                showGoalDialog = false
+            }
+        )
+    }
+}
+
+@Composable
+fun WeeklyGoalCard(
+    targetMinutes: Int,
+    progressMinutes: Int,
+    onEditClick: () -> Unit
+) {
+    val progress = if (targetMinutes > 0) progressMinutes.toFloat() / targetMinutes.toFloat() else 0f
+    val isGoalReached = progressMinutes >= targetMinutes
+
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
+    ) {
+        Column(Modifier.padding(16.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    "Weekly Goal",
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                TextButton(onClick = onEditClick, contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp)) {
+                    Text("Edit", style = MaterialTheme.typography.labelMedium)
+                }
+            }
+
+            Spacer(Modifier.height(4.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.Bottom
+            ) {
+                Text(
+                    text = "$progressMinutes / $targetMinutes min",
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = if (isGoalReached) "Goal reached" else "${(progress * 100).toInt()}%",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = if (isGoalReached) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline
+                )
+            }
+
+            Spacer(Modifier.height(8.dp))
+
+            LinearProgressIndicator(
+                progress = { progress.coerceAtMost(1f) },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(4.dp),
+                color = MaterialTheme.colorScheme.primary,
+                trackColor = MaterialTheme.colorScheme.surface,
+                strokeCap = androidx.compose.ui.graphics.StrokeCap.Round
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun WeeklyGoalEditDialog(
+    currentGoal: Int,
+    onDismiss: () -> Unit,
+    onGoalSelected: (Int) -> Unit
+) {
+    val presets = listOf(60, 120, 180, 300)
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Weekly Goal") },
+        text = {
+            Column {
+                Text(
+                    "Choose your weekly focus target:",
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    presets.forEach { minutes ->
+                        FilterChip(
+                            selected = minutes == currentGoal,
+                            onClick = { onGoalSelected(minutes) },
+                            label = { Text("${minutes}m") },
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancel")
+            }
+        }
+    )
+}
+
+@Composable
+fun RecentSessionsSection(sessions: List<RecentSession>) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
+    ) {
+        Column(Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
+            sessions.forEachIndexed { index, session ->
+                RecentSessionRow(session)
+                if (index < sessions.size - 1) {
+                    HorizontalDivider(
+                        color = MaterialTheme.colorScheme.outline.copy(alpha = 0.1f),
+                        thickness = 0.5.dp
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun RecentSessionRow(session: RecentSession) {
+    val durationMinutes = (session.durationMillis / (1000 * 60)).toInt()
+    
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 12.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = "${session.dateLabel} · ${session.mode.name.lowercase().replaceFirstChar { it.uppercase() }}",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Spacer(Modifier.height(2.dp))
+            Text(
+                text = "${durationMinutes} min · ${session.stateLabel}",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+            )
+        }
+        
+        Icon(
+            imageVector = if (session.stateLabel == "Completed") Icons.Default.CheckCircle else Icons.Default.Info,
+            contentDescription = null,
+            tint = if (session.stateLabel == "Completed") MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
+            modifier = Modifier.size(16.dp)
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun StatsRangeSelector(
+    selectedRange: StatsRange,
+    onRangeSelected: (StatsRange) -> Unit
+) {
+    val ranges = listOf(StatsRange.SEVEN_DAYS, StatsRange.THIRTY_DAYS, StatsRange.ALL)
+    val rangeLabels = listOf("7D", "30D", "All")
+
+    SingleChoiceSegmentedButtonRow(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        ranges.forEachIndexed { index, range ->
+            SegmentedButton(
+                selected = range == selectedRange,
+                onClick = { onRangeSelected(range) },
+                shape = SegmentedButtonDefaults.itemShape(index = index, count = ranges.size),
+                label = { Text(rangeLabels[index]) }
+            )
         }
     }
 }

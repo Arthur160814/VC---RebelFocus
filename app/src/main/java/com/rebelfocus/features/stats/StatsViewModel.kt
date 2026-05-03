@@ -11,11 +11,14 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
+import com.rebelfocus.core.data.datastore.UserPreferencesDataStore
 import javax.inject.Inject
 
 @HiltViewModel
 class StatsViewModel @Inject constructor(
-    private val getFocusStatsUseCase: GetFocusStatsUseCase
+    private val getFocusStatsUseCase: GetFocusStatsUseCase,
+    private val userPreferencesDataStore: UserPreferencesDataStore
 ) : ViewModel() {
 
     private val _selectedRange = MutableStateFlow(StatsRange.SEVEN_DAYS)
@@ -32,5 +35,11 @@ class StatsViewModel @Inject constructor(
 
     fun setRange(range: StatsRange) {
         _selectedRange.value = range
+    }
+
+    fun updateWeeklyGoal(minutes: Int) {
+        viewModelScope.launch {
+            userPreferencesDataStore.setWeeklyFocusGoalMinutes(minutes)
+        }
     }
 }

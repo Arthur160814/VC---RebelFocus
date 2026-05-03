@@ -1,5 +1,6 @@
 package com.rebelfocus.features.stats;
 
+import com.rebelfocus.core.data.datastore.UserPreferencesDataStore;
 import com.rebelfocus.core.domain.usecase.GetFocusStatsUseCase;
 import dagger.internal.DaggerGenerated;
 import dagger.internal.Factory;
@@ -25,21 +26,27 @@ import javax.inject.Provider;
 public final class StatsViewModel_Factory implements Factory<StatsViewModel> {
   private final Provider<GetFocusStatsUseCase> getFocusStatsUseCaseProvider;
 
-  public StatsViewModel_Factory(Provider<GetFocusStatsUseCase> getFocusStatsUseCaseProvider) {
+  private final Provider<UserPreferencesDataStore> userPreferencesDataStoreProvider;
+
+  public StatsViewModel_Factory(Provider<GetFocusStatsUseCase> getFocusStatsUseCaseProvider,
+      Provider<UserPreferencesDataStore> userPreferencesDataStoreProvider) {
     this.getFocusStatsUseCaseProvider = getFocusStatsUseCaseProvider;
+    this.userPreferencesDataStoreProvider = userPreferencesDataStoreProvider;
   }
 
   @Override
   public StatsViewModel get() {
-    return newInstance(getFocusStatsUseCaseProvider.get());
+    return newInstance(getFocusStatsUseCaseProvider.get(), userPreferencesDataStoreProvider.get());
   }
 
   public static StatsViewModel_Factory create(
-      Provider<GetFocusStatsUseCase> getFocusStatsUseCaseProvider) {
-    return new StatsViewModel_Factory(getFocusStatsUseCaseProvider);
+      Provider<GetFocusStatsUseCase> getFocusStatsUseCaseProvider,
+      Provider<UserPreferencesDataStore> userPreferencesDataStoreProvider) {
+    return new StatsViewModel_Factory(getFocusStatsUseCaseProvider, userPreferencesDataStoreProvider);
   }
 
-  public static StatsViewModel newInstance(GetFocusStatsUseCase getFocusStatsUseCase) {
-    return new StatsViewModel(getFocusStatsUseCase);
+  public static StatsViewModel newInstance(GetFocusStatsUseCase getFocusStatsUseCase,
+      UserPreferencesDataStore userPreferencesDataStore) {
+    return new StatsViewModel(getFocusStatsUseCase, userPreferencesDataStore);
   }
 }

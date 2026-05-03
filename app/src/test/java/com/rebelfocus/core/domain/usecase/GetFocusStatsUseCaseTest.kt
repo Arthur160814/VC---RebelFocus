@@ -15,15 +15,23 @@ import org.junit.Test
 import java.time.LocalDate
 import java.time.ZoneId
 
+import com.rebelfocus.core.data.datastore.UserPreferencesDataStore
+import io.mockk.every
+import io.mockk.mockk
+import kotlinx.coroutines.flow.flowOf
+
 class GetFocusStatsUseCaseTest {
 
     private lateinit var fakeSessionDao: FakeSessionDao
+    private lateinit var mockPrefs: UserPreferencesDataStore
     private lateinit var getFocusStatsUseCase: GetFocusStatsUseCase
 
     @Before
     fun setup() {
         fakeSessionDao = FakeSessionDao()
-        getFocusStatsUseCase = GetFocusStatsUseCase(fakeSessionDao)
+        mockPrefs = mockk()
+        every { mockPrefs.weeklyFocusGoalMinutes } returns flowOf(120)
+        getFocusStatsUseCase = GetFocusStatsUseCase(fakeSessionDao, mockPrefs)
     }
 
     @Test
@@ -46,6 +54,8 @@ class GetFocusStatsUseCaseTest {
         assertEquals(3, stats.currentStreak)
         assertEquals(3, stats.longestStreak)
         assertEquals(5, stats.totalSessions)
+        assertEquals(5, stats.recentSessions.size)
+        assertEquals("Today", stats.recentSessions[0].dateLabel)
     }
 
     @Test

@@ -498,52 +498,52 @@ public final class DaggerRebelFocusApp_HiltComponents_SingletonC {
 
     @IdentifierNameString
     private static final class LazyClassKeyProvider {
-      static String com_rebelfocus_features_backup_BackupViewModel = "com.rebelfocus.features.backup.BackupViewModel";
-
-      static String com_rebelfocus_features_dashboard_DashboardViewModel = "com.rebelfocus.features.dashboard.DashboardViewModel";
-
-      static String com_rebelfocus_features_profiles_ProfileEditViewModel = "com.rebelfocus.features.profiles.ProfileEditViewModel";
+      static String com_rebelfocus_features_apps_AppPickerViewModel = "com.rebelfocus.features.apps.AppPickerViewModel";
 
       static String com_rebelfocus_features_logging_DiagnosticLogViewModel = "com.rebelfocus.features.logging.DiagnosticLogViewModel";
 
+      static String com_rebelfocus_features_profiles_ProfileEditViewModel = "com.rebelfocus.features.profiles.ProfileEditViewModel";
+
       static String com_rebelfocus_features_automation_AutomationListViewModel = "com.rebelfocus.features.automation.AutomationListViewModel";
 
-      static String com_rebelfocus_features_profiles_ProfileListViewModel = "com.rebelfocus.features.profiles.ProfileListViewModel";
+      static String com_rebelfocus_features_backup_BackupViewModel = "com.rebelfocus.features.backup.BackupViewModel";
 
       static String com_rebelfocus_features_stats_StatsViewModel = "com.rebelfocus.features.stats.StatsViewModel";
 
-      static String com_rebelfocus_features_onboarding_OnboardingViewModel = "com.rebelfocus.features.onboarding.OnboardingViewModel";
+      static String com_rebelfocus_features_profiles_ProfileListViewModel = "com.rebelfocus.features.profiles.ProfileListViewModel";
 
-      static String com_rebelfocus_features_apps_AppPickerViewModel = "com.rebelfocus.features.apps.AppPickerViewModel";
+      static String com_rebelfocus_features_dashboard_DashboardViewModel = "com.rebelfocus.features.dashboard.DashboardViewModel";
+
+      static String com_rebelfocus_features_onboarding_OnboardingViewModel = "com.rebelfocus.features.onboarding.OnboardingViewModel";
 
       static String com_rebelfocus_features_automation_AutomationEditViewModel = "com.rebelfocus.features.automation.AutomationEditViewModel";
 
       @KeepFieldType
-      BackupViewModel com_rebelfocus_features_backup_BackupViewModel2;
-
-      @KeepFieldType
-      DashboardViewModel com_rebelfocus_features_dashboard_DashboardViewModel2;
-
-      @KeepFieldType
-      ProfileEditViewModel com_rebelfocus_features_profiles_ProfileEditViewModel2;
+      AppPickerViewModel com_rebelfocus_features_apps_AppPickerViewModel2;
 
       @KeepFieldType
       DiagnosticLogViewModel com_rebelfocus_features_logging_DiagnosticLogViewModel2;
 
       @KeepFieldType
+      ProfileEditViewModel com_rebelfocus_features_profiles_ProfileEditViewModel2;
+
+      @KeepFieldType
       AutomationListViewModel com_rebelfocus_features_automation_AutomationListViewModel2;
 
       @KeepFieldType
-      ProfileListViewModel com_rebelfocus_features_profiles_ProfileListViewModel2;
+      BackupViewModel com_rebelfocus_features_backup_BackupViewModel2;
 
       @KeepFieldType
       StatsViewModel com_rebelfocus_features_stats_StatsViewModel2;
 
       @KeepFieldType
-      OnboardingViewModel com_rebelfocus_features_onboarding_OnboardingViewModel2;
+      ProfileListViewModel com_rebelfocus_features_profiles_ProfileListViewModel2;
 
       @KeepFieldType
-      AppPickerViewModel com_rebelfocus_features_apps_AppPickerViewModel2;
+      DashboardViewModel com_rebelfocus_features_dashboard_DashboardViewModel2;
+
+      @KeepFieldType
+      OnboardingViewModel com_rebelfocus_features_onboarding_OnboardingViewModel2;
 
       @KeepFieldType
       AutomationEditViewModel com_rebelfocus_features_automation_AutomationEditViewModel2;
@@ -602,7 +602,7 @@ public final class DaggerRebelFocusApp_HiltComponents_SingletonC {
     }
 
     private GetFocusStatsUseCase getFocusStatsUseCase() {
-      return new GetFocusStatsUseCase(singletonCImpl.sessionDao());
+      return new GetFocusStatsUseCase(singletonCImpl.sessionDao(), singletonCImpl.userPreferencesDataStoreProvider.get());
     }
 
     @SuppressWarnings("unchecked")
@@ -632,55 +632,55 @@ public final class DaggerRebelFocusApp_HiltComponents_SingletonC {
 
     @IdentifierNameString
     private static final class LazyClassKeyProvider {
-      static String com_rebelfocus_features_automation_AutomationListViewModel = "com.rebelfocus.features.automation.AutomationListViewModel";
+      static String com_rebelfocus_features_automation_AutomationEditViewModel = "com.rebelfocus.features.automation.AutomationEditViewModel";
 
       static String com_rebelfocus_features_backup_BackupViewModel = "com.rebelfocus.features.backup.BackupViewModel";
+
+      static String com_rebelfocus_features_onboarding_OnboardingViewModel = "com.rebelfocus.features.onboarding.OnboardingViewModel";
+
+      static String com_rebelfocus_features_profiles_ProfileListViewModel = "com.rebelfocus.features.profiles.ProfileListViewModel";
+
+      static String com_rebelfocus_features_automation_AutomationListViewModel = "com.rebelfocus.features.automation.AutomationListViewModel";
+
+      static String com_rebelfocus_features_apps_AppPickerViewModel = "com.rebelfocus.features.apps.AppPickerViewModel";
+
+      static String com_rebelfocus_features_logging_DiagnosticLogViewModel = "com.rebelfocus.features.logging.DiagnosticLogViewModel";
+
+      static String com_rebelfocus_features_stats_StatsViewModel = "com.rebelfocus.features.stats.StatsViewModel";
 
       static String com_rebelfocus_features_profiles_ProfileEditViewModel = "com.rebelfocus.features.profiles.ProfileEditViewModel";
 
       static String com_rebelfocus_features_dashboard_DashboardViewModel = "com.rebelfocus.features.dashboard.DashboardViewModel";
 
-      static String com_rebelfocus_features_onboarding_OnboardingViewModel = "com.rebelfocus.features.onboarding.OnboardingViewModel";
+      @KeepFieldType
+      AutomationEditViewModel com_rebelfocus_features_automation_AutomationEditViewModel2;
 
-      static String com_rebelfocus_features_automation_AutomationEditViewModel = "com.rebelfocus.features.automation.AutomationEditViewModel";
+      @KeepFieldType
+      BackupViewModel com_rebelfocus_features_backup_BackupViewModel2;
 
-      static String com_rebelfocus_features_profiles_ProfileListViewModel = "com.rebelfocus.features.profiles.ProfileListViewModel";
+      @KeepFieldType
+      OnboardingViewModel com_rebelfocus_features_onboarding_OnboardingViewModel2;
 
-      static String com_rebelfocus_features_logging_DiagnosticLogViewModel = "com.rebelfocus.features.logging.DiagnosticLogViewModel";
-
-      static String com_rebelfocus_features_apps_AppPickerViewModel = "com.rebelfocus.features.apps.AppPickerViewModel";
-
-      static String com_rebelfocus_features_stats_StatsViewModel = "com.rebelfocus.features.stats.StatsViewModel";
+      @KeepFieldType
+      ProfileListViewModel com_rebelfocus_features_profiles_ProfileListViewModel2;
 
       @KeepFieldType
       AutomationListViewModel com_rebelfocus_features_automation_AutomationListViewModel2;
 
       @KeepFieldType
-      BackupViewModel com_rebelfocus_features_backup_BackupViewModel2;
+      AppPickerViewModel com_rebelfocus_features_apps_AppPickerViewModel2;
+
+      @KeepFieldType
+      DiagnosticLogViewModel com_rebelfocus_features_logging_DiagnosticLogViewModel2;
+
+      @KeepFieldType
+      StatsViewModel com_rebelfocus_features_stats_StatsViewModel2;
 
       @KeepFieldType
       ProfileEditViewModel com_rebelfocus_features_profiles_ProfileEditViewModel2;
 
       @KeepFieldType
       DashboardViewModel com_rebelfocus_features_dashboard_DashboardViewModel2;
-
-      @KeepFieldType
-      OnboardingViewModel com_rebelfocus_features_onboarding_OnboardingViewModel2;
-
-      @KeepFieldType
-      AutomationEditViewModel com_rebelfocus_features_automation_AutomationEditViewModel2;
-
-      @KeepFieldType
-      ProfileListViewModel com_rebelfocus_features_profiles_ProfileListViewModel2;
-
-      @KeepFieldType
-      DiagnosticLogViewModel com_rebelfocus_features_logging_DiagnosticLogViewModel2;
-
-      @KeepFieldType
-      AppPickerViewModel com_rebelfocus_features_apps_AppPickerViewModel2;
-
-      @KeepFieldType
-      StatsViewModel com_rebelfocus_features_stats_StatsViewModel2;
     }
 
     private static final class SwitchingProvider<T> implements Provider<T> {
@@ -732,7 +732,7 @@ public final class DaggerRebelFocusApp_HiltComponents_SingletonC {
           return (T) new ProfileListViewModel(singletonCImpl.bindFocusProfileRepositoryProvider.get(), singletonCImpl.blockingDecisionEngineProvider.get());
 
           case 9: // com.rebelfocus.features.stats.StatsViewModel 
-          return (T) new StatsViewModel(viewModelCImpl.getFocusStatsUseCase());
+          return (T) new StatsViewModel(viewModelCImpl.getFocusStatsUseCase(), singletonCImpl.userPreferencesDataStoreProvider.get());
 
           default: throw new AssertionError(id);
         }
